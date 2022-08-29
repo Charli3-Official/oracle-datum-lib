@@ -1,15 +1,17 @@
 module Utils where
 
-import PlutusTx (ToData(..))
+import PlutusTx (ToData(..), FromData (fromBuiltinData))
 import PlutusTx.Prelude
 import PlutusTx.Maybe ( Maybe(Just) )
 import PlutusTx.Builtins (matchData, mkMap)
+import Plutus.V1.Ledger.Api (BuiltinData(BuiltinData))
 
-
+{-# INLINABLE fromJust #-}
 fromJust :: Maybe a -> a
 fromJust (Just a) = a
 fromJust _ = traceError "Nothing"
 
+{-# INLINABLE insertMap #-}
 insertMap :: Integer -> BuiltinData -> BuiltinData -> BuiltinData
 insertMap idx v pm = matchData pm (const err) insert err err err
   where
@@ -18,3 +20,20 @@ insertMap idx v pm = matchData pm (const err) insert err err err
 
     err :: a -> BuiltinData
     err = traceError "Not a BuiltinMap"
+
+{-# INLINABLE lookupMap #-}
+lookupMap :: BuiltinData -> BuiltinData -> Maybe BuiltinData
+lookupMap pm k = matchData pm (const err) lookup err err err
+  where
+    lookup :: [(BuiltinData, BuiltinData)] -> Maybe BuiltinData
+    lookup [] = Nothing
+    lookup ((ik, iv):xs) = if ik==k then Just iv else lookup xs
+
+    err :: a -> b
+    err = const $ traceError "Invalid PriceMap: Not a BuiltinMap"
+
+{-# INLINABLE failIfNotStandard #-}
+failIfNotStandard :: FromData a => BuiltinString -> BuiltinData -> a
+failIfNotStandard e v = case fromBuiltinData v of
+                            Nothing -> traceError e
+                            Just a -> a

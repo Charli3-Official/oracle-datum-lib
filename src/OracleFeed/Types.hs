@@ -1,5 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude  #-}
-
 module OracleFeed.Types where
 
 import PlutusTx.Builtins (BuiltinData)
@@ -11,4 +9,4 @@ type SharedData = BuiltinData
 type ExtendedData = BuiltinData
 
 type PriceMap = BuiltinData
-type PriceData = [PriceMap]
+type PriceData = BuiltinData
