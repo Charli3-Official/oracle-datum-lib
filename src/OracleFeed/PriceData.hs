@@ -5,7 +5,7 @@ import Plutus.V1.Ledger.Api ( ToData(..)
                             , POSIXTime
                             , CurrencySymbol
                             , TokenName
-                            , UnsafeFromData (unsafeFromBuiltinData), FromData (fromBuiltinData)
+                            , FromData
                             )
 import PlutusTx.Builtins ( mkMap, mkConstr, mkI, matchData )
 
@@ -102,12 +102,12 @@ setCustomField pm idx v | idx < 0 || idx > 9 = insertMap idx (toBuiltinData v) p
                         | otherwise          = traceError "Standard Field Id"
 
 {-# INLINABLE getCustomField #-}
-getCustomField :: FromData a => PriceMap -> Maybe a
-getCustomField pm = failPriceData <$> lookupMap pm (mkI 8)
+getCustomField :: FromData a => PriceMap -> Integer -> Maybe a
+getCustomField pm idx = failPriceData <$> lookupMap pm (mkI idx)
 
 {-# INLINABLE getPriceMaps #-}
 getPriceMaps :: PriceData -> [PriceMap]
-getPriceMaps pd = matchData pd (\n xs -> xs) err err err err
+getPriceMaps pd = matchData pd (\_ xs -> xs) err err err err
   where
     err :: a -> [PriceMap]
     err = const $ traceError "Invalid PriceData: Not a constructor"
