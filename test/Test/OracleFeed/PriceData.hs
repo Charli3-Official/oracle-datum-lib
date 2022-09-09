@@ -15,8 +15,6 @@ import PlutusTx.Prelude
 import Plutus.V1.Ledger.Scripts hiding (evaluateScript)
 import Test.Utils
 import OracleFeed
-import PlutusTx.Builtins
-
 
 tests :: TestTree
 tests = testGroup "PriceData Construction"
@@ -103,6 +101,7 @@ testCustomFieldGet ex = case getCustomField @Integer ex exCustomIdx of
                                         a == exCustomField
                             Nothing -> traceError "No Custom Field Found"
 
+{-# INLINABLE priceMapTestsGetters #-}
 priceMapTestsGetters :: [PriceMap -> Bool]
 priceMapTestsGetters = [ testPriceMapGet
                        , testPriceGet
@@ -117,6 +116,7 @@ priceMapTestsGetters = [ testPriceMapGet
                        , testCustomFieldGet
                        ]
 
+{-# INLINABLE gettersValidator #-}
 gettersValidator :: ()
 gettersValidator = if and results then () else traceError "Tests Failed"
   where
@@ -194,6 +194,7 @@ testCustomFieldSet ex = traceIfFalse "Wrong CustomField Set" $ testCustomFieldGe
   where
     priceMap = setCustomField ex exCustomIdx exCustomField
 
+{-# INLINABLE priceMapTestsSetters #-}
 priceMapTestsSetters :: [PriceMap -> Bool]
 priceMapTestsSetters = [ testPriceGet
                        , testTimestampSet
@@ -207,6 +208,7 @@ priceMapTestsSetters = [ testPriceGet
                        , testCustomFieldSet
                        ]
 
+{-# INLINABLE settersValidator #-}
 settersValidator :: ()
 settersValidator = if and results then () else traceError "Setter Tests Failed"
   where
