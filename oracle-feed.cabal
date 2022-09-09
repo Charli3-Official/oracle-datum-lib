@@ -23,10 +23,10 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:  OracleFeed
+                      Utils
     other-modules:    OracleFeed.Types
                       OracleFeed.Feed
                       OracleFeed.PriceData
-                      Utils
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -54,7 +54,12 @@ test-suite feed-tests
                         -fno-spec-constr -fno-specialise
     build-depends:       base ^>=4.14.1.0
                         , tasty
+                        , tasty-hunit
+                        , text
                         , plutus-tx
                         , plutus-tx-plugin
                         , plutus-ledger-api
                         , oracle-feed
+                        , plutus-core
+                        , serialise
+                        , hex-text

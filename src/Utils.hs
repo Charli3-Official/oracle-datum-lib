@@ -2,9 +2,7 @@ module Utils where
 
 import PlutusTx (ToData(..), FromData (fromBuiltinData))
 import PlutusTx.Prelude
-import PlutusTx.Maybe ( Maybe(Just) )
 import PlutusTx.Builtins (matchData, mkMap)
-import Plutus.V1.Ledger.Api (BuiltinData(BuiltinData))
 
 {-# INLINABLE fromJust #-}
 fromJust :: Maybe a -> a
@@ -19,11 +17,11 @@ insertMap idx v pm = matchData pm (const err) insert err err err
     insert = mkMap . (:) (toBuiltinData idx, v)
 
     err :: a -> BuiltinData
-    err = traceError "Not a BuiltinMap"
+    err = const $ traceError "Not a BuiltinMap"
 
 {-# INLINABLE lookupMap #-}
 lookupMap :: BuiltinData -> BuiltinData -> Maybe BuiltinData
-lookupMap pm k = matchData pm (const err) lookup err err err
+lookupMap k pm = matchData pm (const err) lookup err err err
   where
     lookup :: [(BuiltinData, BuiltinData)] -> Maybe BuiltinData
     lookup [] = Nothing
