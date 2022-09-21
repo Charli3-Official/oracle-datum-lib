@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE RankNTypes #-}
 module OracleFeed.PriceData where
 
@@ -12,11 +11,16 @@ import Plutus.V1.Ledger.Api ( ToData(..)
 import PlutusTx.Builtins ( mkMap, mkConstr, mkI, matchData )
 
 import Utils ( insertMap, lookupMap, fromJust, failIfNotStandard )
-import OracleFeed.Types
+import OracleFeed.Types ( GenericData, PriceData, PriceMap )
 
 {-# INLINABLE mkPriceData #-}
-mkPriceData :: [PriceMap] -> GenericData
-mkPriceData = mkConstr 2
+mkPriceData :: PriceMap -> GenericData
+mkPriceData pm = mkConstr 2 arr
+  where
+    arr :: [PriceMap]
+    arr = case lookupMap (mkI 0) pm of
+      Nothing -> traceError "PriceMap does not have a price"
+      Just _ -> [pm]
 
 {-# INLINABLE mkPriceMap #-}
 mkPriceMap :: Integer -> PriceMap
@@ -98,20 +102,20 @@ setQuoteName pm v = insertMap 9 (toBuiltinData v) pm
 getQuoteName :: PriceMap -> Maybe TokenName
 getQuoteName pm = failPriceData <$> lookupMap (mkI 9) pm
 
-{-# INLINABLE setCustomField #-}
-setCustomField :: ToData a => PriceMap -> Integer -> a -> PriceMap
-setCustomField pm idx v | idx < 0 || idx > 9 = insertMap idx (toBuiltinData v) pm
-                        | otherwise          = traceError "Standard Field Id"
+{-# INLINABLE setPriceCustomField #-}
+setPriceCustomField :: ToData a => PriceMap -> Integer -> a -> PriceMap
+setPriceCustomField pm idx v | idx < 0 || idx > 9 = insertMap idx (toBuiltinData v) pm
+                             | otherwise          = traceError "Standard Field Id"
 
-{-# INLINABLE getCustomField #-}
-getCustomField :: FromData a => PriceMap -> Integer -> Maybe a
-getCustomField pm idx = failPriceData <$> lookupMap (mkI idx) pm
+{-# INLINABLE getPriceCustomField #-}
+getPriceCustomField :: FromData a => PriceMap -> Integer -> Maybe a
+getPriceCustomField pm idx = failPriceData <$> lookupMap (mkI idx) pm
 
-{-# INLINABLE getPriceMaps #-}
-getPriceMaps :: PriceData -> [PriceMap]
-getPriceMaps pd = matchData pd (\_ xs -> xs) err err err err
+{-# INLINABLE getPriceMap #-}
+getPriceMap :: PriceData -> PriceMap
+getPriceMap pd = matchData pd (\_ [xs] -> xs) err err err err
   where
-    err :: a -> [PriceMap]
+    err :: a -> b
     err = const $ traceError "Invalid PriceData: Not a constructor"
 
 {-# INLINABLE failPriceData #-}

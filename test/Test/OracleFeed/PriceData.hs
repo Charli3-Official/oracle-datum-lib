@@ -6,7 +6,7 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module Test.OracleFeed.PriceData where
+module Test.OracleFeed.PriceData (tests) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -96,7 +96,7 @@ testQuoteNameGet ex = case getQuoteName ex of
 
 {-# INLINABLE testCustomFieldGet #-}
 testCustomFieldGet :: PriceMap -> Bool
-testCustomFieldGet ex = case getCustomField @Integer ex exCustomIdx of
+testCustomFieldGet ex = case getPriceCustomField @Integer ex exCustomIdx of
                             Just a -> traceIfFalse "Incorrect Custom Field Fetched" $
                                         a == exCustomField
                             Nothing -> traceError "No Custom Field Found"
@@ -121,13 +121,10 @@ gettersValidator :: ()
 gettersValidator = if and results then () else traceError "Tests Failed"
   where
     results :: [Bool]
-    results = priceResults
-
-    priceResults :: [Bool]
-    priceResults = map ($ priceMap) priceMapTestsGetters
+    results = map ($ priceMap) priceMapTestsGetters
 
     priceMap :: PriceMap
-    priceMap = head $ getPriceDatas exBD
+    priceMap = getPriceMap $ head $ getPriceDatas exBD
 
 testGetters :: Script
 testGetters = fromCompiledCode $$(compile [|| gettersValidator ||])
@@ -192,12 +189,11 @@ testQuoteNameSet ex = traceIfFalse "Wrong QuoteName Set" $ testQuoteNameGet pric
 testCustomFieldSet :: PriceMap -> Bool
 testCustomFieldSet ex = traceIfFalse "Wrong CustomField Set" $ testCustomFieldGet priceMap
   where
-    priceMap = setCustomField ex exCustomIdx exCustomField
+    priceMap = setPriceCustomField ex exCustomIdx exCustomField
 
 {-# INLINABLE priceMapTestsSetters #-}
 priceMapTestsSetters :: [PriceMap -> Bool]
-priceMapTestsSetters = [ testPriceGet
-                       , testTimestampSet
+priceMapTestsSetters = [ testTimestampSet
                        , testExpirySet
                        , testBaseIdSet
                        , testQuoteIdSet
@@ -213,10 +209,7 @@ settersValidator :: ()
 settersValidator = if and results then () else traceError "Setter Tests Failed"
   where
     results :: [Bool]
-    results = priceResults
-
-    priceResults :: [Bool]
-    priceResults = map ($ priceMap) priceMapTestsSetters
+    results = map ($ priceMap) priceMapTestsSetters
 
     priceMap :: PriceMap
     priceMap = mkPriceMap exPrice

@@ -2,7 +2,7 @@ module Utils where
 
 import PlutusTx (ToData(..), FromData (fromBuiltinData))
 import PlutusTx.Prelude
-import PlutusTx.Builtins (matchData, mkMap)
+import PlutusTx.Builtins (matchData, mkMap, mkConstr)
 
 {-# INLINABLE fromJust #-}
 fromJust :: Maybe a -> a
@@ -17,7 +17,7 @@ insertMap idx v pm = matchData pm (const err) insert err err err
     insert = mkMap . (:) (toBuiltinData idx, v)
 
     err :: a -> BuiltinData
-    err = const $ traceError "Not a BuiltinMap"
+    err = const $ traceError "insertMap: Not a BuiltinMap"
 
 {-# INLINABLE lookupMap #-}
 lookupMap :: BuiltinData -> BuiltinData -> Maybe BuiltinData
@@ -28,7 +28,26 @@ lookupMap k pm = matchData pm (const err) lookup err err err
     lookup ((ik, iv):xs) = if ik==k then Just iv else lookup xs
 
     err :: a -> b
-    err = const $ traceError "Invalid PriceMap: Not a BuiltinMap"
+    err = const $ traceError "lookupMap: Not a BuiltinMap"
+
+{-# INLINABLE takeConstr #-}
+takeConstr :: BuiltinData -> (Integer, [BuiltinData])
+takeConstr c = matchData c (,) err err err err
+  where
+    err :: a -> b
+    err = const $ traceError "takeConstr: Not a Constructor"
+
+{-# INLINABLE insertConstrSMap #-}
+insertConstrSMap :: Integer -> BuiltinData -> BuiltinData -> BuiltinData
+insertConstrSMap idx v bd = mkConstr n [insertMap idx v bdmap]
+  where
+    (n,[bdmap]) = takeConstr bd
+
+{-# INLINABLE lookupConstrSMap #-}
+lookupConstrSMap :: BuiltinData -> BuiltinData -> Maybe BuiltinData
+lookupConstrSMap k pm = lookupMap k imap
+  where
+    (_,[imap]) = takeConstr pm
 
 {-# INLINABLE failIfNotStandard #-}
 failIfNotStandard :: FromData a => BuiltinString -> BuiltinData -> a

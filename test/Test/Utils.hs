@@ -16,6 +16,8 @@ import           Plutus.V1.Ledger.Api
 import           Test.Tasty.HUnit
 import           PlutusCore.Evaluation.Machine.Exception
 import           Plutus.V1.Ledger.Scripts
+import Utils (insertMap)
+import OracleFeed (OracleFeed, SharedData, GenericData, PriceMap, ExtendedData)
 
 assertValidator :: Script -> Assertion
 assertValidator = uncurry assertBool . either (const ("", True)) ((, False) . show) . evaluateScriptPure
@@ -31,47 +33,46 @@ evaluateScriptPure s =
                  Left (ErrorWithCause _ _) -> Right logOut
 
 {-# INLINABLE exBD #-}
-exBD :: BuiltinData
+exBD :: OracleFeed
 exBD = BI.mkConstr 0 [ exShareData
                      , exGenData
                      , exExtData
                      ]
 
 {-# INLINABLE exShareData #-}
-exShareData :: BuiltinData
-exShareData = BI.mkConstr 0
-                [ BI.mkMap [(BI.mkI 0, BI.mkConstr 2
-                                    [ BI.mkMap [(BI.mkI 3, BI.mkI exPrecision)] ]
-                            )
-                        ]
-                ]
+exShareData :: SharedData
+exShareData =
+    BI.mkConstr 0 [ BI.mkMap [(BI.mkI 0, exPriceMap')] ]
 
 {-# INLINABLE exGenData #-}
-exGenData :: BuiltinData
-exGenData = BI.mkConstr 2
-            [ exPriceMap
-            ]
+exGenData :: GenericData
+exGenData = BI.mkConstr 2 [ exPriceMap ]
 
 {-# INLINABLE exPriceMap #-}
-exPriceMap :: BuiltinData
-exPriceMap = BI.mkMap [ (BI.mkI 0, BI.mkI exPrice)
-                      , (BI.mkI 1, BI.mkI $ toInteger exTimestamp)
-                      , (BI.mkI 2, BI.mkI $ toInteger exExpiry)
-                      , (BI.mkI 3, BI.mkI exPrecision)
-                      , (BI.mkI 4, BI.mkI exBaseId)
-                      , (BI.mkI 5, BI.mkI exQuoteId)
-                      , (BI.mkI 6, PlutusTx.toBuiltinData exBaseSymbol)
-                      , (BI.mkI 7, PlutusTx.toBuiltinData exQuoteSymbol)
-                      , (BI.mkI 8, PlutusTx.toBuiltinData exBaseName)
-                      , (BI.mkI 9, PlutusTx.toBuiltinData exQuoteName)
-                      , (BI.mkI exCustomIdx, BI.mkI exCustomField)
-                      ]
+exPriceMap :: PriceMap
+exPriceMap = insertMap 0 (BI.mkI exPrice) exPriceMap'
+
+{-# INLINABLE exPriceMap' #-}
+exPriceMap' :: PriceMap
+exPriceMap' = BI.mkMap [ (BI.mkI 1, BI.mkI $ toInteger exTimestamp)
+                       , (BI.mkI 2, BI.mkI $ toInteger exExpiry)
+                       , (BI.mkI 3, BI.mkI exPrecision)
+                       , (BI.mkI 4, BI.mkI exBaseId)
+                       , (BI.mkI 5, BI.mkI exQuoteId)
+                       , (BI.mkI 6, PlutusTx.toBuiltinData exBaseSymbol)
+                       , (BI.mkI 7, PlutusTx.toBuiltinData exQuoteSymbol)
+                       , (BI.mkI 8, PlutusTx.toBuiltinData exBaseName)
+                       , (BI.mkI 9, PlutusTx.toBuiltinData exQuoteName)
+                       , (BI.mkI exCustomIdx, BI.mkI exCustomField)
+                       ]
 
 {-# INLINABLE exExtData #-}
-exExtData :: BuiltinData
+exExtData :: ExtendedData
 exExtData = BI.mkConstr 1 [ BI.mkMap [ (BI.mkI 0, BI.mkI exOracleProviderId)
-                                    , (BI.mkI 1, BI.mkI exDataSourceCount)
-                                    ]
+                                     , (BI.mkI 1, BI.mkI exDataSourceCount)
+                                     , (BI.mkI 2, BI.mkI exDataSignatoriesCount)
+                                     , (BI.mkI 3, BI.mkB exOracleProviderSignature)
+                                     ]
                             ]
 
 {-# INLINABLE exPrice #-}
@@ -121,6 +122,13 @@ exOracleProviderId = 1
 {-# INLINABLE exDataSourceCount #-}
 exDataSourceCount :: Integer
 exDataSourceCount = 12
+
+{-# INLINABLE exDataSignatoriesCount #-}
+exDataSignatoriesCount :: Integer
+exDataSignatoriesCount = 20
+
+exOracleProviderSignature :: BuiltinByteString
+exOracleProviderSignature = "AAAAAAAAAAAAA"
 
 {-# INLINABLE exCustomIdx #-}
 exCustomIdx :: Integer

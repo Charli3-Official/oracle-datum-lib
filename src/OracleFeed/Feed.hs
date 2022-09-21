@@ -41,7 +41,7 @@ filterOFeed ofeed c = matchData ofeed filterData err err err err
     filterData' (x:xs) = isConstrData x++filterData' xs
 
     isConstrData :: BuiltinData -> [BuiltinData]
-    isConstrData d = matchData d (\n xs -> if n==c then xs else [] ) err err err err
+    isConstrData d = matchData d (\n xs -> [mkConstr c xs | n==c] ) err err err err
 
     err :: a -> [BuiltinData]
     err = const $ traceError "Invalid OracleFeed: Not a constructor"

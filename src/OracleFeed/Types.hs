@@ -5,8 +5,8 @@ import PlutusTx.Builtins (BuiltinData)
 type OracleFeed = BuiltinData
 
 type GenericData = BuiltinData
-type SharedData = BuiltinData
 type ExtendedData = BuiltinData
+type SharedData = BuiltinData
 
 type PriceMap = BuiltinData
 type PriceData = BuiltinData
