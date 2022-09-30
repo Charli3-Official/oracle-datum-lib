@@ -85,25 +85,25 @@ testGetters = fromCompiledCode $$(compile [|| gettersValidator ||])
 testOracleProviderSet :: ExtendedData -> Bool
 testOracleProviderSet ex = traceIfFalse "Wrong OracleProvider Set" $ testOracleProviderGet extendedData
   where
-    extendedData = setOracleProvider ex exOracleProviderId
+    extendedData = setOracleProvider exOracleProviderId ex
 
 {-# INLINABLE testDataSourceCountSet #-}
 testDataSourceCountSet :: ExtendedData -> Bool
 testDataSourceCountSet ex = traceIfFalse "Wrong DataSourceCount Set" $ testDataSourceCountGet extendedData
   where
-    extendedData = setDataSourceCount ex exDataSourceCount
+    extendedData = setDataSourceCount exDataSourceCount ex
 
 {-# INLINABLE testDataSignatoriesCountSet #-}
 testDataSignatoriesCountSet :: ExtendedData -> Bool
 testDataSignatoriesCountSet ex = traceIfFalse "Wrong DataSignatoriesCount Set" $ testDataSignatoriesCountGet extendedData
   where
-    extendedData = setDataSignatoriesCount ex exDataSignatoriesCount
+    extendedData = setDataSignatoriesCount exDataSignatoriesCount ex
 
 {-# INLINABLE testOracleProviderSignatureSet #-}
 testOracleProviderSignatureSet :: ExtendedData -> Bool
 testOracleProviderSignatureSet ex = traceIfFalse "Wrong OracleProviderSignature Set" $ testOracleProviderSignatureGet extendedData
   where
-    extendedData = setOracleProviderSignature ex exOracleProviderSignature
+    extendedData = setOracleProviderSignature exOracleProviderSignature ex
 
 {-# INLINABLE extendedDataTestsSetters #-}
 extendedDataTestsSetters :: [ExtendedData -> Bool]

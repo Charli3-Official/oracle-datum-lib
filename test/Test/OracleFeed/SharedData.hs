@@ -50,7 +50,7 @@ testGetters = fromCompiledCode $$(compile [|| gettersValidator ||])
 testSetPriceMap :: SharedData -> Bool
 testSetPriceMap ex = traceIfFalse "Wrong Timestamp Set" $ testPriceMapGet sharedData
   where
-    sharedData = setSharedPriceData ex exPriceMap'
+    sharedData = setSharedPriceData exPriceMap' ex
 
 
 {-# INLINABLE settersValidator #-}
@@ -60,7 +60,7 @@ settersValidator = if testSetPriceMap sharedData
     else traceError "Setter Tests Failed"
   where
     sharedData :: SharedData
-    sharedData = setSharedPriceData emptySharedData $ setTimestamp emptySharedPriceMap 5555
+    sharedData = setSharedPriceData (setTimestamp 5555 emptySharedPriceMap) emptySharedData
 
 testSetters :: Script
 testSetters = fromCompiledCode $$(compile [|| settersValidator ||])

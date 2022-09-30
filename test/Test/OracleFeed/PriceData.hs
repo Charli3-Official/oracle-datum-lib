@@ -135,61 +135,61 @@ testGetters = fromCompiledCode $$(compile [|| gettersValidator ||])
 testTimestampSet :: PriceMap -> Bool
 testTimestampSet ex = traceIfFalse "Wrong Timestamp Set" $ testTimestampGet priceMap
   where
-    priceMap = setTimestamp ex exTimestamp
+    priceMap = setTimestamp exTimestamp ex
 
 {-# INLINABLE testExpirySet #-}
 testExpirySet :: PriceMap -> Bool
 testExpirySet ex = traceIfFalse "Wrong Expiry Set" $ testExpiryGet priceMap
   where
-    priceMap = setExpiry ex exExpiry
+    priceMap = setExpiry exExpiry ex
 
 {-# INLINABLE testPrecisionSet #-}
 testPrecisionSet :: PriceMap -> Bool
 testPrecisionSet ex = traceIfFalse "Wrong Precision Set" $ testPrecisionGet priceMap
   where
-    priceMap = setPrecision ex exPrecision
+    priceMap = setPrecision exPrecision ex
 
 {-# INLINABLE testBaseIdSet #-}
 testBaseIdSet :: PriceMap -> Bool
 testBaseIdSet ex = traceIfFalse "Wrong BaseId Set" $ testBaseIdGet priceMap
   where
-    priceMap = setBaseId ex exBaseId
+    priceMap = setBaseId exBaseId ex
 
 {-# INLINABLE testQuoteIdSet #-}
 testQuoteIdSet :: PriceMap -> Bool
 testQuoteIdSet ex = traceIfFalse "Wrong QuoteId Set" $ testQuoteIdGet priceMap
   where
-    priceMap = setQuoteId ex exQuoteId
+    priceMap = setQuoteId exQuoteId ex
 
 {-# INLINABLE testBaseSymbolSet #-}
 testBaseSymbolSet :: PriceMap -> Bool
 testBaseSymbolSet ex = traceIfFalse "Wrong BaseSymbol Set" $ testBaseSymbolGet priceMap
   where
-    priceMap = setBaseSymbol ex exBaseSymbol
+    priceMap = setBaseSymbol exBaseSymbol ex
 
 {-# INLINABLE testQuoteSymbolSet #-}
 testQuoteSymbolSet :: PriceMap -> Bool
 testQuoteSymbolSet ex = traceIfFalse "Wrong QuoteSymbol Set" $ testQuoteSymbolGet priceMap
   where
-    priceMap = setQuoteSymbol ex exQuoteSymbol
+    priceMap = setQuoteSymbol exQuoteSymbol ex
 
 {-# INLINABLE testBaseNameSet #-}
 testBaseNameSet :: PriceMap -> Bool
 testBaseNameSet ex = traceIfFalse "Wrong BaseName Set" $ testBaseNameGet priceMap
   where
-    priceMap = setBaseName ex exBaseName
+    priceMap = setBaseName exBaseName ex
 
 {-# INLINABLE testQuoteNameSet #-}
 testQuoteNameSet :: PriceMap -> Bool
 testQuoteNameSet ex = traceIfFalse "Wrong QuoteName Set" $ testQuoteNameGet priceMap
   where
-    priceMap = setQuoteName ex exQuoteName
+    priceMap = setQuoteName exQuoteName ex
 
 {-# INLINABLE testCustomFieldSet #-}
 testCustomFieldSet :: PriceMap -> Bool
 testCustomFieldSet ex = traceIfFalse "Wrong CustomField Set" $ testCustomFieldGet priceMap
   where
-    priceMap = setPriceCustomField ex exCustomIdx exCustomField
+    priceMap = setPriceCustomField exCustomIdx exCustomField ex
 
 {-# INLINABLE priceMapTestsSetters #-}
 priceMapTestsSetters :: [PriceMap -> Bool]

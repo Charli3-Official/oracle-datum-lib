@@ -14,8 +14,8 @@ emptySharedPriceMap :: PriceMap
 emptySharedPriceMap = mkMap []
 
 {-# INLINABLE setSharedPriceData #-}
-setSharedPriceData :: SharedData -> PriceMap -> SharedData
-setSharedPriceData sd pm = insertConstrSMap 0 pm sd
+setSharedPriceData :: PriceMap -> SharedData -> SharedData
+setSharedPriceData pm = insertConstrSMap 0 pm
 
 {-# INLINABLE getSharedPriceData #-}
 getSharedPriceData :: SharedData -> Maybe PriceMap

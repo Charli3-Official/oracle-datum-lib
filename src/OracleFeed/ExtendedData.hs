@@ -12,41 +12,41 @@ emptyExtendedData :: ExtendedData
 emptyExtendedData = mkConstr 1 [mkMap []]
 
 {-# INLINABLE setOracleProvider #-}
-setOracleProvider :: ExtendedData -> Integer -> ExtendedData
-setOracleProvider ex idx = insertConstrSMap 0 (mkI idx) ex
+setOracleProvider :: Integer -> ExtendedData -> ExtendedData
+setOracleProvider idx = insertConstrSMap 0 (mkI idx)
 
 {-# INLINABLE getOracleProvider #-}
 getOracleProvider :: ExtendedData -> Maybe Integer
 getOracleProvider ed = failExtendedData <$> lookupConstrSMap (mkI 0) ed
 
 {-# INLINABLE setDataSourceCount #-}
-setDataSourceCount :: ExtendedData -> Integer -> ExtendedData
-setDataSourceCount ex n = insertConstrSMap 1 (mkI n) ex
+setDataSourceCount :: Integer -> ExtendedData -> ExtendedData
+setDataSourceCount n = insertConstrSMap 1 (mkI n)
 
 {-# INLINABLE getDataSourceCount #-}
 getDataSourceCount :: ExtendedData -> Maybe Integer
 getDataSourceCount ed = failExtendedData <$> lookupConstrSMap (mkI 1) ed
 
 {-# INLINABLE setDataSignatoriesCount #-}
-setDataSignatoriesCount :: ExtendedData -> Integer -> ExtendedData
-setDataSignatoriesCount ex n = insertConstrSMap 2 (mkI n) ex
+setDataSignatoriesCount :: Integer -> ExtendedData -> ExtendedData
+setDataSignatoriesCount n = insertConstrSMap 2 (mkI n)
 
 {-# INLINABLE getDataSignatoriesCount #-}
 getDataSignatoriesCount :: ExtendedData -> Maybe Integer
 getDataSignatoriesCount ed = failExtendedData <$> lookupConstrSMap (mkI 2) ed
 
 {-# INLINABLE setOracleProviderSignature #-}
-setOracleProviderSignature :: ExtendedData -> BuiltinByteString -> ExtendedData
-setOracleProviderSignature ex s = insertConstrSMap 3 (toBuiltinData s) ex
+setOracleProviderSignature :: BuiltinByteString -> ExtendedData -> ExtendedData
+setOracleProviderSignature s = insertConstrSMap 3 (toBuiltinData s)
 
 {-# INLINABLE getOracleProviderSignature #-}
 getOracleProviderSignature :: ExtendedData -> Maybe BuiltinByteString
 getOracleProviderSignature ed = failExtendedData <$> lookupConstrSMap (mkI 3) ed
 
 {-# INLINABLE setExtendedCustomField #-}
-setExtendedCustomField :: ToData a => ExtendedData -> Integer -> a -> ExtendedData
-setExtendedCustomField pm idx v
-  | idx < 0 || idx > 100 = insertConstrSMap idx (toBuiltinData v) pm
+setExtendedCustomField :: ToData a => Integer -> a -> ExtendedData -> ExtendedData
+setExtendedCustomField idx v
+  | idx < 0 || idx > 100 = insertConstrSMap idx (toBuiltinData v)
   | otherwise            = traceError "setExtendedCustomField: Standard Field Id"
 
 {-# INLINABLE getCustomField #-}
