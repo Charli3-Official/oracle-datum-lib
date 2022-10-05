@@ -1,4 +1,16 @@
-module OracleFeed.ExtendedData where
+module OracleFeed.ExtendedData
+  ( emptyExtendedData
+  , setOracleProvider
+  , getOracleProvider
+  , setDataSourceCount
+  , getDataSourceCount
+  , setDataSignatoriesCount
+  , getDataSignatoriesCount
+  , setOracleProviderSignature
+  , getOracleProviderSignature
+  , setExtendedCustomField
+  , getExtendedCustomField
+  ) where
 
 import OracleFeed.Types
 import PlutusTx.Builtins
@@ -49,9 +61,9 @@ setExtendedCustomField idx v
   | idx < 0 || idx > 100 = insertConstrSMap idx (toBuiltinData v)
   | otherwise            = traceError "setExtendedCustomField: Standard Field Id"
 
-{-# INLINABLE getCustomField #-}
-getCustomField :: FromData a => ExtendedData -> Integer -> Maybe a
-getCustomField pm idx = failExtendedData <$> lookupConstrSMap (mkI idx) pm
+{-# INLINABLE getExtendedCustomField #-}
+getExtendedCustomField :: FromData a => ExtendedData -> Integer -> Maybe a
+getExtendedCustomField pm idx = failExtendedData <$> lookupConstrSMap (mkI idx) pm
 
 {-# INLINABLE failExtendedData #-}
 failExtendedData :: FromData a => BuiltinData -> a

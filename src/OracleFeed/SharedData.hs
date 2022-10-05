@@ -1,4 +1,9 @@
-module OracleFeed.SharedData where
+module OracleFeed.SharedData
+  ( emptyExtendedData
+  , emptySharedPriceMap
+  , setSharedPriceData
+  , getSharedPriceData
+  ) where
 
 import OracleFeed.Types
 import PlutusTx.Builtins (mkMap, mkConstr, mkI)

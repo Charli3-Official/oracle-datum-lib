@@ -1,4 +1,10 @@
-module OracleFeed.Feed where
+module OracleFeed.Feed
+  ( mkOracleFeed
+  , getPriceDatas
+  , getSharedData
+  , getExtendedData
+  )
+where
 
 import PlutusTx.Prelude
 import PlutusTx.Builtins ( mkConstr, matchData )

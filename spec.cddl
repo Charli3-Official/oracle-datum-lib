@@ -1,0 +1,62 @@
+; Oracle Datum
+; The oracle datum is composed of a generic, shared and extended data.
+oracle_datum = #6.121(oracle_datum_list)
+oracle_datum_list =
+  [ ?  shared_data
+  , 1* generic_data
+  , ?  extended_data
+  ]
+
+; At the moment we have one type of generic data:
+;   - price_data, for the exchange rate between two assets.
+generic_data = price_data
+
+; A price_data entry normally defines the "Currency Pair" being priced.
+;  A "Currency Pair" is defined as "the first listed currency or base currency is
+;  bought while the second listed currency in a currency pair or quote currency is
+;  sold." Each currency is defined separately in the entry, and referred to as the
+;  "base" and "quote" currency.
+price_data = #6.123([price_map]) ; Const 2
+price_map =
+  { ? 0 : price        ; how many quote currency is received per base currency spent
+  , ? 1 : posixtime    ; unix timestamp related to when the price data was created
+  , ? 2 : posixtime    ; unix timestamp related to when the price data is expired
+  , ? 3 : precision    ; how many decimals of precision price is specified at
+  , ? 4 : asset_id     ; id of base
+  , ? 5 : asset_id     ; id of quote
+  , ? 6 : asset_symbol ; symbol of base
+  , ? 7 : asset_symbol ; symbol of quote
+  , ? 8 : asset_name   ; name of base
+  , ? 9 : asset_name   ; name of quote
+  }
+precision    = uint
+price        = uint
+asset_id     = scripthash
+asset_symbol = bytes .size (0..32)
+asset_name   = bytes .size (0..32)
+scripthash   = $hash28
+$hash28 /= bytes .size 28
+
+; The shared data contains fields that can be mixed with each of the generic datas
+;  to reduce the size of the datum.
+shared_data = #6.121([shared_map]) ; Const 0
+shared_map =
+  { ? 0: price_map
+  }
+
+; The extended data carries provider-specific information, and may
+;  be individually customized by oracle providers to provide data
+;  they deem relevant. It's thus not entirely defined by spec,
+;  but indices below 100 are "reserved" by the spec.
+extended_data = #6.122([extended_map]) ; Const 1
+extended_map =
+  { ? 0: oracle_provider_id
+  , ? 1: data_source_count
+  , ? 2: data_signatories_count
+  , ? 3: oracle_provider_signature
+  }
+oracle_provider_id        = uint
+data_source_count         = uint
+data_signatories_count    = uint
+oracle_provider_signature = tstr
+posixtime                 = uint

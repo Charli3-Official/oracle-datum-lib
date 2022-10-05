@@ -1,5 +1,31 @@
 {-# LANGUAGE RankNTypes #-}
-module OracleFeed.PriceData where
+module OracleFeed.PriceData
+  ( mkPriceData
+  , mkPriceMap
+  , setPrice
+  , getPrice
+  , setTimestamp
+  , getTimestamp
+  , setExpiry
+  , getExpiry
+  , setPrecision
+  , getPrecision
+  , setBaseId
+  , getBaseId
+  , setQuoteId
+  , getQuoteId
+  , setBaseSymbol
+  , getBaseSymbol
+  , setQuoteSymbol
+  , getQuoteSymbol
+  , setBaseName
+  , getBaseName
+  , setQuoteName
+  , getQuoteName
+  , setPriceCustomField
+  , getPriceCustomField
+  , getPriceMap
+  ) where
 
 import PlutusTx.Prelude
 import Plutus.V1.Ledger.Api ( ToData(..)
@@ -28,12 +54,7 @@ mkPriceMap p = mkMap [(mkI 0, mkI p)]
 
 {-# INLINABLE setPrice #-}
 setPrice :: Integer -> PriceMap -> PriceMap
-setPrice v pm = insertMap 0 (toBuiltinData v) arr
-  where
-    arr :: PriceMap
-    arr = case lookupMap (mkI 0) pm of
-            Nothing -> traceError "can't set a price to shared map"
-            Just _ -> pm
+setPrice v = insertMap 0 (toBuiltinData v)
 
 {-# INLINABLE getPrice #-}
 getPrice :: PriceMap -> Integer
