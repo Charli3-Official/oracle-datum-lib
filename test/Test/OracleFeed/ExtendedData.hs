@@ -24,7 +24,7 @@ tests = testGroup "ExtendedData Construction"
 
 {-# INLINABLE testExtendedDataGet #-}
 testExtendedDataGet :: ExtendedData -> Bool
-testExtendedDataGet ex = traceIfFalse "Wrong Extended Data" $ ex == exExtData
+testExtendedDataGet ex = traceIfFalse "Wrong Extended Data" $ takeExD ex == exExtData
 
 {-# INLINABLE testOracleProviderGet #-}
 testOracleProviderGet :: ExtendedData -> Bool
@@ -55,7 +55,7 @@ testOracleProviderSignatureGet ex = case getOracleProviderSignature ex of
                         Nothing -> traceError "No Oracle Provider Signature Found"
 
 {-# INLINABLE extendedDataTestsGetters #-}
-extendedDataTestsGetters :: [PriceMap -> Bool]
+extendedDataTestsGetters :: [ExtendedData -> Bool]
 extendedDataTestsGetters = [ testExtendedDataGet
                            , testOracleProviderGet
                            , testDataSignatoriesCountGet
@@ -71,7 +71,7 @@ gettersValidator = if and results then () else traceError "Tests Failed"
     results = map ($ extendedData) extendedDataTestsGetters
 
     extendedData :: ExtendedData
-    extendedData = case getExtendedData exBD of
+    extendedData = case getExtendedData (OracleFeed exBD) of
       Nothing -> traceError "Extended Data not found"
       Just bd -> bd
 

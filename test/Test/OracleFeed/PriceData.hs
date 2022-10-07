@@ -24,7 +24,7 @@ tests = testGroup "PriceData Construction"
 
 {-# INLINABLE testPriceMapGet #-}
 testPriceMapGet :: PriceMap -> Bool
-testPriceMapGet ex = traceIfFalse "Wrong Price Map" $ ex == exPriceMap
+testPriceMapGet ex = traceIfFalse "Wrong Price Map" $ takePM ex == exPriceMap
 
 {-# INLINABLE testPriceGet #-}
 testPriceGet :: PriceMap -> Bool
@@ -124,7 +124,7 @@ gettersValidator = if and results then () else traceError "Tests Failed"
     results = map ($ priceMap) priceMapTestsGetters
 
     priceMap :: PriceMap
-    priceMap = getPriceMap $ head $ getPriceDatas exBD
+    priceMap = getPriceMap $ head $ getPriceDatas (OracleFeed exBD)
 
 testGetters :: Script
 testGetters = fromCompiledCode $$(compile [|| gettersValidator ||])

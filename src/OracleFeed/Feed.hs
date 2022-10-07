@@ -14,29 +14,29 @@ import Utils ( fromJust )
 
 {-# INLINABLE mkOracleFeed #-}
 mkOracleFeed :: Maybe SharedData -> [GenericData] -> Maybe ExtendedData -> OracleFeed
-mkOracleFeed sd gds ed = mkConstr 0 $ sharedS++gds++extendedS
+mkOracleFeed sd gds ed = OracleFeed $ mkConstr 0 $ sharedS++(takeGD <$> gds)++extendedS
   where
     sharedS :: [BuiltinData]
-    sharedS = [fromJust sd | isJust sd]
+    sharedS = [takeShD $ fromJust sd | isJust sd]
 
     extendedS :: [BuiltinData]
-    extendedS = [fromJust ed | isJust ed]
+    extendedS = [takeExD $ fromJust ed | isJust ed]
 
 {-# INLINABLE getPriceDatas #-}
 getPriceDatas :: OracleFeed -> [PriceData]
-getPriceDatas ofeed = filterOFeed ofeed 2
+getPriceDatas ofeed = PriceData <$> filterOFeed ofeed 2
 
 {-# INLINABLE getSharedData #-}
 getSharedData :: OracleFeed -> Maybe SharedData
-getSharedData ofeed = listToMaybe $ filterOFeed ofeed 0
+getSharedData ofeed = listToMaybe $ SharedData <$> filterOFeed ofeed 0
 
 {-# INLINABLE getExtendedData #-}
 getExtendedData :: OracleFeed -> Maybe ExtendedData
-getExtendedData ofeed = listToMaybe $ filterOFeed ofeed 1
+getExtendedData ofeed = listToMaybe $ ExtendedData <$> filterOFeed ofeed 1
 
 {-# INLINABLE filterOFeed #-}
 filterOFeed :: OracleFeed -> Integer -> [BuiltinData]
-filterOFeed ofeed c = matchData ofeed filterData err err err err
+filterOFeed ofeed c = matchData (takeOF ofeed) filterData err err err err
   where
     filterData :: Integer -> [BuiltinData] -> [BuiltinData]
     filterData a xs | a==0 = filterData' xs

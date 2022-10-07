@@ -10,6 +10,7 @@ module OracleFeed.ExtendedData
   , getOracleProviderSignature
   , setExtendedCustomField
   , getExtendedCustomField
+  , takeExD
   ) where
 
 import OracleFeed.Types
@@ -21,49 +22,49 @@ import Plutus.V2.Ledger.Api (FromData)
 
 {-# INLINABLE emptyExtendedData #-}
 emptyExtendedData :: ExtendedData
-emptyExtendedData = mkConstr 1 [mkMap []]
+emptyExtendedData = ExtendedData $ mkConstr 1 [mkMap []]
 
 {-# INLINABLE setOracleProvider #-}
 setOracleProvider :: Integer -> ExtendedData -> ExtendedData
-setOracleProvider idx = insertConstrSMap 0 (mkI idx)
+setOracleProvider idx = mapExD (insertConstrSMap 0 (mkI idx))
 
 {-# INLINABLE getOracleProvider #-}
 getOracleProvider :: ExtendedData -> Maybe Integer
-getOracleProvider ed = failExtendedData <$> lookupConstrSMap (mkI 0) ed
+getOracleProvider ed = failExtendedData <$> lookupConstrSMap (mkI 0) (takeExD ed)
 
 {-# INLINABLE setDataSourceCount #-}
 setDataSourceCount :: Integer -> ExtendedData -> ExtendedData
-setDataSourceCount n = insertConstrSMap 1 (mkI n)
+setDataSourceCount n = mapExD (insertConstrSMap 1 (mkI n))
 
 {-# INLINABLE getDataSourceCount #-}
 getDataSourceCount :: ExtendedData -> Maybe Integer
-getDataSourceCount ed = failExtendedData <$> lookupConstrSMap (mkI 1) ed
+getDataSourceCount ed = failExtendedData <$> lookupConstrSMap (mkI 1) (takeExD ed)
 
 {-# INLINABLE setDataSignatoriesCount #-}
 setDataSignatoriesCount :: Integer -> ExtendedData -> ExtendedData
-setDataSignatoriesCount n = insertConstrSMap 2 (mkI n)
+setDataSignatoriesCount n = mapExD (insertConstrSMap 2 (mkI n))
 
 {-# INLINABLE getDataSignatoriesCount #-}
 getDataSignatoriesCount :: ExtendedData -> Maybe Integer
-getDataSignatoriesCount ed = failExtendedData <$> lookupConstrSMap (mkI 2) ed
+getDataSignatoriesCount ed = failExtendedData <$> lookupConstrSMap (mkI 2) (takeExD ed)
 
 {-# INLINABLE setOracleProviderSignature #-}
 setOracleProviderSignature :: BuiltinByteString -> ExtendedData -> ExtendedData
-setOracleProviderSignature s = insertConstrSMap 3 (toBuiltinData s)
+setOracleProviderSignature s = mapExD (insertConstrSMap 3 (toBuiltinData s))
 
 {-# INLINABLE getOracleProviderSignature #-}
 getOracleProviderSignature :: ExtendedData -> Maybe BuiltinByteString
-getOracleProviderSignature ed = failExtendedData <$> lookupConstrSMap (mkI 3) ed
+getOracleProviderSignature ed = failExtendedData <$> lookupConstrSMap (mkI 3) (takeExD ed)
 
 {-# INLINABLE setExtendedCustomField #-}
 setExtendedCustomField :: ToData a => Integer -> a -> ExtendedData -> ExtendedData
 setExtendedCustomField idx v
-  | idx < 0 || idx > 100 = insertConstrSMap idx (toBuiltinData v)
+  | idx < 0 || idx > 100 = mapExD (insertConstrSMap idx (toBuiltinData v))
   | otherwise            = traceError "setExtendedCustomField: Standard Field Id"
 
 {-# INLINABLE getExtendedCustomField #-}
 getExtendedCustomField :: FromData a => ExtendedData -> Integer -> Maybe a
-getExtendedCustomField pm idx = failExtendedData <$> lookupConstrSMap (mkI idx) pm
+getExtendedCustomField ed idx = failExtendedData <$> lookupConstrSMap (mkI idx) (takeExD ed)
 
 {-# INLINABLE failExtendedData #-}
 failExtendedData :: FromData a => BuiltinData -> a
@@ -71,3 +72,7 @@ failExtendedData = failIfNotStandard err
   where
     err :: BuiltinString
     err = "ExtendedData: Index not valid standard."
+
+{-# INLINABLE mapExD #-}
+mapExD :: (BuiltinData -> BuiltinData) -> ExtendedData -> ExtendedData
+mapExD f = ExtendedData . f . takeExD

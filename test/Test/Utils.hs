@@ -16,8 +16,7 @@ import           Plutus.V1.Ledger.Api
 import           Test.Tasty.HUnit
 import           PlutusCore.Evaluation.Machine.Exception
 import           Plutus.V1.Ledger.Scripts
-import Utils (insertMap)
-import OracleFeed (OracleFeed, SharedData, GenericData, PriceMap, ExtendedData)
+import           Utils (insertMap)
 
 assertValidator :: Script -> Assertion
 assertValidator = uncurry assertBool . either (const ("", True)) ((, False) . show) . evaluateScriptPure
@@ -33,27 +32,27 @@ evaluateScriptPure s =
                  Left (ErrorWithCause _ _) -> Right logOut
 
 {-# INLINABLE exBD #-}
-exBD :: OracleFeed
+exBD :: BuiltinData
 exBD = BI.mkConstr 0 [ exShareData
                      , exGenData
                      , exExtData
                      ]
 
 {-# INLINABLE exShareData #-}
-exShareData :: SharedData
+exShareData :: BuiltinData
 exShareData =
     BI.mkConstr 0 [ BI.mkMap [(BI.mkI 0, exPriceMap')] ]
 
 {-# INLINABLE exGenData #-}
-exGenData :: GenericData
+exGenData :: BuiltinData
 exGenData = BI.mkConstr 2 [ exPriceMap ]
 
 {-# INLINABLE exPriceMap #-}
-exPriceMap :: PriceMap
+exPriceMap :: BuiltinData
 exPriceMap = insertMap 0 (BI.mkI exPrice) exPriceMap'
 
 {-# INLINABLE exPriceMap' #-}
-exPriceMap' :: PriceMap
+exPriceMap' :: BuiltinData
 exPriceMap' = BI.mkMap [ (BI.mkI 1, BI.mkI $ toInteger exTimestamp)
                        , (BI.mkI 2, BI.mkI $ toInteger exExpiry)
                        , (BI.mkI 3, BI.mkI exPrecision)
@@ -67,7 +66,7 @@ exPriceMap' = BI.mkMap [ (BI.mkI 1, BI.mkI $ toInteger exTimestamp)
                        ]
 
 {-# INLINABLE exExtData #-}
-exExtData :: ExtendedData
+exExtData :: BuiltinData
 exExtData = BI.mkConstr 1 [ BI.mkMap [ (BI.mkI 0, BI.mkI exOracleProviderId)
                                      , (BI.mkI 1, BI.mkI exDataSourceCount)
                                      , (BI.mkI 2, BI.mkI exDataSignatoriesCount)

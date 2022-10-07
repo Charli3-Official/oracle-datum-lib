@@ -24,7 +24,7 @@ tests = testGroup "SharedData Construction"
 
 {-# INLINABLE testPriceMapGet #-}
 testPriceMapGet :: SharedData -> Bool
-testPriceMapGet ex = traceIfFalse "Wrong Shared Data" $ pm == exPriceMap'
+testPriceMapGet ex = traceIfFalse "Wrong Shared Data" $ takePM pm == exPriceMap'
   where
     pm = case getSharedPriceData ex of
         Nothing -> traceError "Did not find the shared PriceMap"
@@ -37,7 +37,7 @@ gettersValidator = if testPriceMapGet sharedData
         else traceError "Tests Failed"
   where
     sharedData :: SharedData
-    sharedData = case getSharedData exBD of
+    sharedData = case getSharedData (OracleFeed exBD) of
         Nothing -> traceError "Failed to find SharedData"
         Just bd -> bd
 
@@ -50,7 +50,7 @@ testGetters = fromCompiledCode $$(compile [|| gettersValidator ||])
 testSetPriceMap :: SharedData -> Bool
 testSetPriceMap ex = traceIfFalse "Wrong Timestamp Set" $ testPriceMapGet sharedData
   where
-    sharedData = setSharedPriceData exPriceMap' ex
+    sharedData = setSharedPriceData (PriceMap exPriceMap') ex
 
 
 {-# INLINABLE settersValidator #-}

@@ -12,16 +12,19 @@ import PlutusTx.Prelude
 
 {-# INLINABLE emptySharedData #-}
 emptySharedData :: SharedData
-emptySharedData = mkConstr 0 [mkMap []]
+emptySharedData = SharedData $ mkConstr 0 [mkMap []]
 
 {-# INLINABLE emptySharedPriceMap #-}
 emptySharedPriceMap :: PriceMap
-emptySharedPriceMap = mkMap []
+emptySharedPriceMap = PriceMap $ mkMap []
 
 {-# INLINABLE setSharedPriceData #-}
 setSharedPriceData :: PriceMap -> SharedData -> SharedData
-setSharedPriceData pm = insertConstrSMap 0 pm
+setSharedPriceData pm = mapShD (insertConstrSMap 0 $ takePM pm)
 
 {-# INLINABLE getSharedPriceData #-}
 getSharedPriceData :: SharedData -> Maybe PriceMap
-getSharedPriceData = lookupConstrSMap (mkI 0)
+getSharedPriceData sd = PriceMap <$> lookupConstrSMap (mkI 0) (takeShD sd)
+
+mapShD :: (BuiltinData -> BuiltinData) -> SharedData -> SharedData
+mapShD f = SharedData . f . takeShD
