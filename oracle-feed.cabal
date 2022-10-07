@@ -16,10 +16,6 @@ version:            0.1.0.0
 author:             MartorSkull
 maintainer:         martin_montane_6@hotmail.com
 
--- A copyright notice.
--- copyright:
--- category:
-extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:  OracleFeed

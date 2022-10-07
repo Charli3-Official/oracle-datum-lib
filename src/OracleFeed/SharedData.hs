@@ -1,5 +1,5 @@
 module OracleFeed.SharedData
-  ( emptyExtendedData
+  ( emptySharedData
   , emptySharedPriceMap
   , setSharedPriceData
   , getSharedPriceData
