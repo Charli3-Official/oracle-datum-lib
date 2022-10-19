@@ -2,7 +2,7 @@ module Utils where
 
 import PlutusTx (ToData(..), FromData (fromBuiltinData))
 import PlutusTx.Prelude
-import PlutusTx.Builtins (matchData, mkMap, mkConstr)
+import PlutusTx.Builtins (matchData, mkMap, mkConstr, mkI)
 
 {-# INLINABLE fromJust #-}
 fromJust :: Maybe a -> a
@@ -11,10 +11,12 @@ fromJust _ = traceError "Nothing"
 
 {-# INLINABLE insertMap #-}
 insertMap :: Integer -> BuiltinData -> BuiltinData -> BuiltinData
-insertMap idx v pm = matchData pm (const err) insert err err err
+insertMap idx v pm = matchData pm (const err) (mkMap . insert) err err err
   where
-    insert :: [(BuiltinData, BuiltinData)] -> BuiltinData
-    insert = mkMap . (:) (toBuiltinData idx, v)
+    insert :: [(BuiltinData, BuiltinData)] -> [(BuiltinData, BuiltinData)]
+    insert [] = [(toBuiltinData idx, v)]
+    insert (p@(k,_):xs) | k==mkI idx = (k,v):xs
+                        | otherwise = p:insert xs
 
     err :: a -> BuiltinData
     err = const $ traceError "insertMap: Not a BuiltinMap"
